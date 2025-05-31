@@ -11,8 +11,8 @@ using Movies;
 namespace Movies.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250528183012_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250531093855_connectionsUserTitles")]
+    partial class connectionsUserTitles
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,14 +32,23 @@ namespace Movies.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Titles");
                 });
@@ -52,11 +61,7 @@ namespace Movies.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -64,9 +69,27 @@ namespace Movies.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Movies.Entities.Title", b =>
+                {
+                    b.HasOne("Movies.Entities.User", null)
+                        .WithMany("Movies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Movies.Entities.User", b =>
+                {
+                    b.Navigation("Movies");
                 });
 #pragma warning restore 612, 618
         }
